@@ -1,13 +1,29 @@
 const imageContainer = document.getElementById("image-container");
 const loader = document.getElementById("loader");
 
+let ready = false;
+let imagesLoaded = 0;
+
 // this is where the photos from unsplash, will get populated
 let photosArray = [];
 
 // unsplash API
-const count = 10;
-const apiKey = "J2DZ7qT2kIXIBWIyZWFKF6z2df3bZKbsQLe9ADmIB4s";
-const apiURL = `https://api.unsplash.com/photos/random/?client_id=${apiKey}&count=${count}`;
+const count = 30;
+const apiKey = "B8cfxd5gsC-MjcTLc8TzplNXHayXBvafa06W3DIDdv8";
+const apiURL = `https://api.unsplash.com/topics/wallpapers/photos?client_id=${apiKey}&count=${count}`;
+
+// check if all images were loaded
+const imageLoaded = () => {
+  imagesLoaded++;
+  console.log(imagesLoaded);
+
+  if (imagesLoaded === totalImages) {
+    ready = true;
+
+    loader.hidden = true;
+    console.log("ready =", ready);
+  }
+};
 
 // helper function to set attributes on DOM elements
 const setAttributes = (element, attributes) => {
@@ -18,6 +34,10 @@ const setAttributes = (element, attributes) => {
 
 // create elements for links and photos, add to DOM
 const displayPhotos = () => {
+  imagesLoaded = 0;
+  totalImages = photosArray.length;
+  console.log("total images", totalImages);
+
   // run function for each object in photosArray
   photosArray.forEach((photo) => {
     //   creating an anchor element to link to unsplash
@@ -41,6 +61,9 @@ const displayPhotos = () => {
     //   alt: photo.alt_description,
     //   title: photo.alt_description,
     // });
+
+    // event listenerm check when each is finished loading
+    img.addEventListener("load", imageLoaded);
 
     // put img inside the a element, then put both inside img container element
     item.appendChild(img);
@@ -67,9 +90,11 @@ const getPhotos = async () => {
 // check to see if scrolling near bottom of page, load more photos
 window.addEventListener("scroll", () => {
   if (
-    window.innerHeight + window.scrollY >=
-    document.body.offsetHeight - 1000
+    window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000 &&
+    ready
   ) {
+    // so it will only be true again if the images equal 30 again
+    ready = false;
     getPhotos();
   }
 });
